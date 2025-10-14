@@ -149,18 +149,6 @@ A full evaluation report and comparative study with traditional fine-tuning will
 
 ---
 
-## Contributing
-
-Contributions are welcome. Please open issues or pull requests for bug reports, feature requests, or code improvements. Follow the code style guidelines in `.github/CONTRIBUTING.md`.
-
----
-
-## License
-
-This project is released under the MIT License. See `LICENSE` for details.
-
----
-
 ## References
 
 * Mitchell, E., et al. “In-Context Editing: Learning Knowledge from Self-Induced Distributions.”
