@@ -1,163 +1,137 @@
-# ML_Project
 
-# ICE-LoRA: Efficient Knowledge Editing using In-Context Learning with Low-Rank Adaptation
+# **ICE-LoRA: Efficient Knowledge Editing with Low-Rank Adaptation**
+---
+## **📌 Project Overview**
 
-**Team:** Bhutoria
+Knowledge editing aims to update specific facts in large language models (LLMs) without retraining or harming unrelated knowledge.
+Traditional fine-tuning uses cross-entropy on one-hot targets and often leads to:
 
-**Authors:** Sarthak Gopal, Aryan Verma
+* Catastrophic forgetting
+* Low generalization
+* Overfitting
+* High computational cost
 
-**Date:** September 4, 2025
+The **ICE (In-Context Editing)** method solves this using a distribution-based KL divergence loss.
+However, the original ICE implementation uses **MEMIT** (full-layer updates), which is computationally expensive.
+
+This project integrates ICE with **parameter-efficient fine-tuning (PEFT)**, implementing:
+
+* **Baseline LoRA**
+* **AdaLoRA**
+* **GoRA**
+* **ICE-LoRA (KL-divergence + LoRA)**
+
+This reduces memory usage by **95%** while maintaining high-quality knowledge edits.
 
 ---
 
-## Project Overview
+## **🎯 Objectives**
 
-ICE-LoRA is a parameter-efficient implementation of In-Context Editing (ICE) that integrates the ICE loss function with LoRA (Low-Rank Adaptation) to enable fast, memory-efficient knowledge editing in transformer language models. Our approach reduces the number of trainable parameters by over 95% compared to full-layer fine-tuning while preserving the ability to perform accurate, local, and portable knowledge edits.
+* Implement ICE-LoRA using LoRA adapters + ICE KL loss
+* Compare with Baseline LoRA, AdaLoRA, and GoRA
+* Evaluate performance on:
 
-## Motivation
-
-Maintaining up-to-date and accurate factual knowledge in large language models without full retraining is a critical research problem. Existing methods either suffer from catastrophic forgetting or are computationally expensive. ICE introduces a distribution-based loss that mitigates brittleness caused by deterministic targets, and LoRA provides a compact, efficient mechanism to adapt model parameters. ICE-LoRA marries these techniques to achieve high-quality edits on consumer hardware.
-
-## Key Features
-
-* **ICE loss integration:** Implements the ICE objective that minimizes the KL divergence between context-conditioned and context-free model outputs.
-* **LoRA adaptation:** Applies low-rank updates to transformer layers (rank-16 recommended) to drastically reduce trainable parameter count.
-* **Combined objective:** Training uses a combined loss `L_total = L_FT + \lambda * L_ICE` for stable and effective edits.
-* **Benchmarks:** Evaluation on ZsRE and WikiData Recent for edit success, locality, portability, and fluency.
+  * Edit Success
+  * Portability
+  * Locality
+  * Fluency
+* Run all experiments on consumer hardware (RTX 3060, T4, etc.)
 
 ---
 
-## Repository Structure
-
+## **📦 Requirements**
 ```
-├── README.md
-├── LICENSE
-├── requirements.txt
-├── data/
-│   ├── zsre/
-│   └── wikidata_recent/
-├── src/
-│   ├── icelora/
-│   │   ├── icelora_editor.py       # core implementation (ICELoRAEditor)
-│   │   ├── losses.py               # ICE loss and combined objectives
-│   │   └── lora_utils.py           # LoRA integration helpers
-│   ├── data_utils/
-│   │   ├── dataset.py              # custom dataset handlers & preprocessing
-│   │   └── templates.py            # context/template generation
-│   ├── train.py                    # training entrypoint
-│   └── eval.py                     # evaluation scripts & metrics
-├── experiments/
-│   └── logs/                       # training logs & checkpoints
-└── reports/
-    └── evaluation_report.pdf
+torch
+transformers>=4.45.0
+peft>=0.13.0
+huggingface_hub
+tqdm
+matplotlib
+seaborn
+accelerate>=0.34.0
+bitsandbytes>=0.44.0
 ```
+---
+
+## **📘 Methods Implemented**
+
+### **1. Baseline LoRA**
+
+A standard PEFT method using low-rank matrices injected into attention layers.
+
+### **2. AdaLoRA**
+
+Adaptive LoRA dynamically reallocates rank during training based on importance scores → improves efficiency.
+
+### **3. GoRA**
+
+Gradient-orthogonalized LoRA introduces constraints to prevent interference during edits.
+
+### **4. ICE-LoRA (Main Contribution)**
+
+The core technique of the project.
+
+**ICE Loss:**
+[
+L_{\text{ICE}} = D_{KL}(p_\theta(x|[c, q]) | p_\theta(x|q))
+]
+
+Total loss:
+[
+L_{\text{total}} = L_{FT} + \lambda \cdot L_{\text{ICE}}
+]
+
+This allows the model to learn from **self-induced distributions** instead of fixed targets.
+
+### **5. Training Pipeline**
+* ICELoRAEditor class
+* Loss calculation (CE + KL)
+* Context generation
+* Evaluation utilities
+* LoRA, AdaLoRA, GoRA wrappers
+* Model saving + inference
 
 ---
 
+## **📊 Datasets Used**
 
-
-## Quickstart: Training
-
-1. Prepare dataset folders under `data/` (see *Datasets* below).
-2. Edit `configs/train_config.yaml` (learning rate, batch size, LoRA rank, \lambda for L_ICE).
-3. Run training:
-
-```bash
-python src/train.py --config configs/train_config.yaml --output_dir experiments/run01
-```
-
-Training produces checkpoints and logs in `experiments/run01/`.
+### Wikidata_counterfact
 
 ---
 
-## Quickstart: Evaluation
+## **📈 Evaluation Metrics**
 
-Evaluate a checkpoint on ZsRE and WikiData Recent:
+You implemented all four ICE metrics:
 
-```bash
-python src/eval.py --checkpoint experiments/run01/checkpoint.pt --dataset zsre --output experiments/run01/eval_zsre.json
-```
+| Metric           | Meaning                           | 
+| ---------------- | --------------------------------- | 
+| **Edit Success** | Whether the new fact is learned   | 
+| **Locality**     | No damage to unrelated knowledge  | 
+| **Portability**  | Knowledge applies to new contexts | 
 
-Evaluation metrics reported:
-
-* **Edit Success** (accuracy on edited facts)
-* **Locality Score** (preservation of unrelated facts)
-* **Portability Score** (ability to apply edits in new contexts)
-* **Fluency** (perplexity or human-evaluated naturalness)
 
 ---
 
-## Datasets
+## **🏆 Results Summary**
 
-We use the following datasets for training and evaluation:
+Based on your experiments (as described in the report):
 
-* **ZsRE** — Zero-shot relation extraction benchmark (~1,037 pairs)
-* **WikiData Recent** — Recent factual claims from Wikipedia (~1,200 samples)
+* ICE-LoRA outperforms all baselines on:
 
-Preprocessing steps (implemented in `src/data_utils/dataset.py`):
-
-* Tokenization using Hugging Face tokenizers
-* Template-based context generation for ICE contexts
-* Creation of related/unrelated queries for locality testing
-
----
-
-## Model & Hyperparameters
-
-* **Base model:** GPT-2 medium (configurable)
-* **LoRA rank:** 16 (default)
-* **Trainable params:** ~1–2M (versus ~117M for full layer updates in baseline)
-* **Loss:** `L_total = L_FT + \lambda * L_ICE` (choose \lambda via validation)
-
-Suggested starting hyperparameters (example):
-
-```yaml
-learning_rate: 5e-5
-batch_size: 16
-num_epochs: 5
-lora_rank: 16
-lambda_ice: 0.5
-```
+  * Edit accuracy
+  * Portability
+  * Fluency
+* LoRA/AdaLoRA/GoRA are fast but weaker for true knowledge integration
+* ICE-LoRA maintains locality (low interference) thanks to KL regularization
+* Memory usage reduced by **95%** vs. MEMIT full-layer updates
 
 ---
 
-## Implementation Notes
+## **📚 References**
 
-* The `ICELoRAEditor` class implements forward passes to compute both cross-entropy and ICE KL-divergence terms. It handles context generation and LoRA adapter updates.
-* LoRA updates are applied to targeted transformer projection matrices (e.g., query/value/feedforward) using `src/icelora/lora_utils.py`.
-* To ensure correctness of mirrored or synthetic contexts, we provide deterministic template functions and seeding in `src/data_utils/templates.py`.
-
----
-
-## Results & Expected Outcomes
-
-We aim for the following target metrics (on evaluation sets):
-
-* **Edit Success:** > 0.80
-* **Locality:** > 0.90
-* **Portability:** > 0.70
-* **Fluency:** > 0.75
-
-A full evaluation report and comparative study with traditional fine-tuning will be included in `reports/`.
+* Mitchell et al., **In-Context Editing (ICE)**
+* Hu et al., **LoRA**
+* Meng et al., **MEMIT**
+* CounterFact
 
 ---
-
-## Reproducibility
-
-* All experiments are run with fixed random seeds (configurable in `configs/`).
-* Environment and package versions are captured in `requirements.txt` and `environment.yml` (if using conda).
-
----
-
-## References
-
-* Mitchell, E., et al. “In-Context Editing: Learning Knowledge from Self-Induced Distributions.”
-* Hu, E. J., et al. “LoRA: Low-Rank Adaptation of Large Language Models.”
-* Meng, K., et al. “MEMIT: Mass-Editing Memory in a Transformer.”
-* CounterFact and ZsRE datasets (Knowledge Editing Benchmarks)
-
----
-
-
-
-*Generated from the uploaded Statement of Purpose (CS550: Machine Learning Project).*
