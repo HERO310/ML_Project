@@ -127,11 +127,34 @@ Based on your experiments (as described in the report):
 
 ---
 
-## **📚 References**
-
-* Mitchell et al., **In-Context Editing (ICE)**
-* Hu et al., **LoRA**
-* Meng et al., **MEMIT**
-* CounterFact
 
 ---
+
+## **📚 References**
+
+1. **LoRA: Low-Rank Adaptation of Large Language Models**
+   *Edward J. Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu Wang, Weizhu Chen*
+   *International Conference on Learning Representations (ICLR), 2022*
+   [https://arxiv.org/abs/2106.09685](https://arxiv.org/abs/2106.09685)
+
+2. **QLoRA: Efficient Finetuning of Quantized LLMs**
+   *Tim Dettmers, Artidoro Pagnoni, Ari Holtzman, Luke Zettlemoyer*
+   [https://arxiv.org/abs/2305.14314](https://arxiv.org/abs/2305.14314)
+
+3. **AdaLoRA: Adaptive Budget Allocation for Parameter-Efficient Fine-Tuning**
+   *Qingru Zhang, Minshuo Chen, Alexander Bukharin, Pengcheng He, Yu Cheng, Weizhu Chen, Tuo Zhao*
+   *International Conference on Learning Representations (ICLR), 2023*
+   [https://arxiv.org/abs/2303.10512](https://arxiv.org/abs/2303.10512)
+
+4. **DoRA: Weight-Decomposed Low-Rank Adaptation**
+   *Shih-Yang Liu, Chien-Yi Wang, Hongxu Yin, Pavlo Molchanov, Yu-Chiang Frank Wang, Kwang-Ting Cheng, Min-Hung Chen*
+   *International Conference on Machine Learning (ICML), 2024*
+   [https://arxiv.org/abs/2402.09353](https://arxiv.org/abs/2402.09353)
+
+5. **Editing Large Language Models: Problems, Methods, and Opportunities**
+   *Yunzhi Yao, Peng Wang, Bozhong Tian, Siyuan Cheng, Zhoubo Li, Shumin Deng, Huajun Chen, Ningyu Zhang*
+   [https://arxiv.org/abs/2406.11194](https://arxiv.org/abs/2406.11194)
+
+---
+
+
